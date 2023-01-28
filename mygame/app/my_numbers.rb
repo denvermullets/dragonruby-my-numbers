@@ -3,8 +3,9 @@ class MyNumbers
 
   def initialize(_args)
     @sprites = [
-      { x: 100, y: 100, w: 300, h: 300, path: 'sprites/misc/dragon-3.png', value: 1 },
-      { x: 450, y: 450, w: 300, h: 300, path: 'sprites/misc/dragon-0.png', value: 2 }
+      { x: 100, y: 100, w: 64, h: 64, path: 'sprites/numbers/square-2.png', value: 2, id: 1 },
+      { x: 450, y: 450, w: 64, h: 64, path: 'sprites/numbers/square-1.png', value: 1, id: 2 },
+      { x: 250, y: 250, w: 64, h: 64, path: 'sprites/numbers/square-1.png', value: 1, id: 3 }
     ]
 
     @dragging = nil
@@ -47,11 +48,17 @@ class MyNumbers
 
   def target_collision(sprite)
     @sprites.each do |stationary_sprite|
-      next if sprite.value == stationary_sprite.value
+      next if sprite.id == stationary_sprite.id
 
       next unless geometry.intersect_rect?(stationary_sprite, sprite)
 
-      outputs.labels << [10, 10.from_top, "#{sprite.value} hits #{stationary_sprite.value}"]
+      if sprite.value == stationary_sprite.value
+        # this would be same numbers colliding
+        # TODO: add animation for colliding blocks
+        @sprites = @sprites.reject { |s| s.id == sprite.id || s.id == stationary_sprite.id }
+      end
+      outputs.labels << [10, 10.from_top, "#{sprite.id} hits #{stationary_sprite.id}"]
+      outputs.labels << [10, 40.from_top, "#{sprite.value} hits #{stationary_sprite.value}"]
       # collision action here
     end
   end
