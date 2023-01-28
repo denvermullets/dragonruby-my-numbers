@@ -1,14 +1,20 @@
+require 'app/number_block.rb'
+
 class MyNumbers
   attr_gtk
 
+  # so we're going to need to have a method to calculate left, right, up, down collision borders
+  # which will let us have each block have 'firmness' when the blocks fall due to gravity
+
   def initialize(_args)
     @sprites = [
-      { x: 100, y: 100, w: 64, h: 64, path: 'sprites/numbers/square-2.png', value: 2, id: 1 },
-      { x: 450, y: 450, w: 64, h: 64, path: 'sprites/numbers/square-1.png', value: 1, id: 2 },
-      { x: 250, y: 250, w: 64, h: 64, path: 'sprites/numbers/square-1.png', value: 1, id: 3 }
+      NumberBlock.new(x: 100, y: 100, value: 2, id: 1),
+      NumberBlock.new(x: 450, y: 450, value: 1, id: 2),
+      NumberBlock.new(x: 250, y: 250, value: 1, id: 3)
     ]
 
     @dragging = nil
+    @gravity = -0.4
   end
 
   def tick
