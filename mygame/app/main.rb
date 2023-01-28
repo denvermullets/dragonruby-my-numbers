@@ -5,3 +5,5 @@ def tick(args)
   $my_numbers.args = args
   $my_numbers.tick
 end
+
+$gtk.reset
