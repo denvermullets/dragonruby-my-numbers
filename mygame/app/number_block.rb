@@ -1,7 +1,8 @@
 class NumberBlock
   attr_sprite
 
-  attr_reader :value, :id
+  attr_reader :value, :id, :h
+  attr_accessor :x, :y, :action
 
   def initialize(x:, y:, value:, id:)
     @x = x
@@ -12,5 +13,6 @@ class NumberBlock
     @path = "sprites/numbers/square-#{value}.png"
     @value = value
     @id = id
+    @action = :sitting
   end
 end
