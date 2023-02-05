@@ -13,6 +13,6 @@ class NumberBlock
     @path = "sprites/numbers/square-#{value}.png"
     @value = value
     @id = id
-    @action = :sitting
+    @action = 'falling'
   end
 end
