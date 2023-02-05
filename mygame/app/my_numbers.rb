@@ -10,7 +10,7 @@ class MyNumbers
     @sprites = [
       NumberBlock.new(x: 600, y: 100, value: 2, id: 1),
       NumberBlock.new(x: 950, y: 450, value: 1, id: 2),
-      NumberBlock.new(x: 750, y: 250, value: 1, id: 3)
+      NumberBlock.new(x: 950, y: 250, value: 1, id: 3)
     ]
 
     @dragging = nil
@@ -40,6 +40,7 @@ class MyNumbers
 
   def debug_stuff
     outputs.labels << [10, 100.from_bottom, "FPS: #{$gtk.current_framerate.round(2)}"]
+    outputs.labels << [10, 60.from_bottom, "collision_x: #{@collision.x || nil}, collision_y: #{@collision.y || nil}"]
     outputs.labels << [10, 40.from_bottom, "x: #{inputs.mouse.x}, y: #{inputs.mouse.y}"]
     outputs.labels << [10, 20.from_bottom, "past_x: #{@past_x}, past_y: #{@past_y}"]
   end
@@ -57,7 +58,9 @@ class MyNumbers
   def drag_sprite
     if state.mouse_held && @dragging
       @collision ||= @sprites.find { |sprite| geometry.intersect_rect?(@dragging, sprite) && sprite.id != @dragging.id }
-      if @collision && (@past_x > inputs.mouse.x) && (inputs.mouse.x < (@dragging.x + (@dragging.w / 2)))
+
+      # need to check if collision is happening on left / right or up / down
+      if collision_dragging_left || collision_dragging_up
         # dragging left
         puts 'moving'
         @dragging.x = inputs.mouse.x - (@dragging.w / 2)
@@ -69,6 +72,8 @@ class MyNumbers
         @dragging.x = @collision.x - 64
         @dragging.y = inputs.mouse.y - (@dragging.h / 2)
       else
+        # one possible solution to the phsyics problem i am having is to just stop centering the cube on the mouse
+        # TODO: figure out how to relatively move the cube based off of mouse inputs.x/y
         @dragging.x = inputs.mouse.x - (@dragging.w / 2)
         @dragging.y = inputs.mouse.y - (@dragging.h / 2)
       end
@@ -80,10 +85,30 @@ class MyNumbers
     end
   end
 
+  def collision_dragging_left
+    @collision && (@past_x > inputs.mouse.x) && (inputs.mouse.x < (@dragging.x + (@dragging.w / 2)))
+  end
+
+  def collision_dragging_up
+    block_h = @collision.h
+    @collision && (@past_y < inputs.mouse.y) && (inputs.mouse.y > (@collision.y + block_h + (block_h / 2)))
+  end
+
   def gravity
     @sprites.each do |sprite|
       # square_collision(sprite)
       sprite.y -= @gravity
+      @sprites.each do |other_sprite|
+        next if sprite == other_sprite
+
+        if geometry.intersect_rect?(other_sprite, sprite)
+          if sprite.y > other_sprite.y
+            sprite.y = other_sprite.y + 64
+          elsif sprite.y < other_sprite.y
+            sprite.y -= 64
+          end
+        end
+      end
       border_y(sprite)
     end
   end
